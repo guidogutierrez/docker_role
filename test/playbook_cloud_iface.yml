@@ -1,0 +1,24 @@
+---
+- name: Bring up docker cloud iface containers
+  hosts: localhost
+  vars:
+    inventory:
+      - name: provision_docker_host_one
+      - name: provision_docker_host_two
+        image: "alpine:latest"
+      - name: provision_docker_host_three
+        image: "ubuntu:14.04"
+      - name: provision_docker_host_four
+        image: "alpine:3.1"
+  roles:
+    - { role: provision_docker, provision_docker_privileged: "{{ true }}", provision_docker_inventory: "{{ inventory }}" }
+
+- name: Run tests for cloud iface
+  hosts: docker_containers
+  vars:
+    file: '/tmp/my_host'
+  roles:
+    # Role under test
+    - { role: test_add_file, test_add_file_path: "{{ file }}"  }
+  tasks:
+    - include: "inc_verify_hosts.yml"
