@@ -29,6 +29,3 @@ install:
 script:
   - ansible-playbook -i test/inventory test/main.yml --syntax-check
   - sudo ansible-playbook -i test/inventory test/main.yml
-
-notifications:
-  webhooks: https://galaxy.ansible.com/api/v1/notifications/
