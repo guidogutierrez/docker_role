@@ -29,8 +29,7 @@
     with_items: "{{ provision_docker_inventory }}"
     changed_when: false
 
-  - debug: msg="{{ item.stdout }}"
-    with_items: provision_docker_id.results
+#
 
 
   # TODO: copy ALL host vars in the inventory
