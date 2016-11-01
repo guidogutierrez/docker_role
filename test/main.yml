@@ -12,5 +12,5 @@
 - name: Run tests for cloud iface
   hosts: localhost
   tasks:
-    - shell: docker exec "{{ item.stdout }}" uname -r
+    - shell: 'docker exec "{{ item.stdout }}" uname -r'
       with_items: provision_docker_id.results
