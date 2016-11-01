@@ -1,2 +1,2 @@
 #!/bin/bash
-docker inspect --format='{{.NetworkSettings.IPAddress}}' $1
+docker inspect --format='{{.Id}}' $1

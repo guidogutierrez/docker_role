@@ -1,16 +1,16 @@
 - name: Bring up inventory group of hosts
-  local_action: 
+  local_action:
     module: docker
     # TODO: |default(random_hostname)
     name: "{{ item }}"
     image: "{{ hostvars[item].image|default(provision_docker_image_default) }}"
     privileged: "{{ hostvars[item].privileged|default(provision_docker_privileged) | bool}}"
     state: "{{ hostvars[item].provision_docker_state | default(provision_docker_state) }}"
-    use_tls: "{{ provision_docker_use_tls }}"
     stop_timeout: 120
     tty: "{{provision_docker_use_docker_connection | bool}}"
     expose:
       - "1-65535"
+    command: /bin/ash
   with_items: "{{ provision_docker_inventory_group }}"
 
 - block:
@@ -32,20 +32,20 @@
       with_indexed_items: "{{ provision_docker_inventory_group }}"
       changed_when: false
 
-    - name: Wait for ssh
-      wait_for:
-        host: "{{ hostvars[item]['ansible_ssh_host'] }}"
-        port: 22
-        timeout: 30
-        connect_timeout: 30
-      with_items: "{{ provision_docker_inventory_group }}"
-      when: not provision_docker_use_docker_connection
+    # - name: Wait for ssh
+    #   wait_for:
+    #     host: "{{ hostvars[item]['ansible_ssh_host'] }}"
+    #     port: 22
+    #     timeout: 30
+    #     connect_timeout: 30
+    #   with_items: "{{ provision_docker_inventory_group }}"
+    #   when: not provision_docker_use_docker_connection
 
-    - name: Make sure ssh is really up
-      ping:
-      delegate_to: "{{ item }}"
-      with_items: "{{ provision_docker_inventory_group }}"
-  when: not provision_docker_use_docker_connection
+  #   - name: Make sure ssh is really up
+  #     ping:
+  #     delegate_to: "{{ item }}"
+  #     with_items: "{{ provision_docker_inventory_group }}"
+  # when: not provision_docker_use_docker_connection
 
 - block:
     # TODO: copy ALL host vars in the inventory
@@ -59,5 +59,3 @@
       with_indexed_items: "{{ provision_docker_inventory_group }}"
       changed_when: false
   when: provision_docker_use_docker_connection
-
-

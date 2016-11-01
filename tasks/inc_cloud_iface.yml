@@ -1,15 +1,15 @@
 - name: Bring up list of hosts
-  local_action: 
+  local_action:
     module: docker
     name: "{{ item['name'] }}"
     image: "{{ item.image|default(provision_docker_image_default) }}"
     privileged: "{{ provision_docker_privileged }}"
     state: "{{ provision_docker_state }}"
-    use_tls: "{{ provision_docker_use_tls }}"
     stop_timeout: 120
     tty: "{{provision_docker_use_docker_connection | bool}}"
     expose:
       - "1-65535"
+    command: tail -f /dev/null
   with_items: "{{ provision_docker_inventory }}"
 
 - block:
@@ -25,45 +25,46 @@
     local_action:
       module: "shell"
       args: "{{ role_path }}/files/docker_inspect.sh {{ item.name }}"
-    register: provision_docker_ip
+    register: provision_docker_id
     with_items: "{{ provision_docker_inventory }}"
     changed_when: false
+
+  - debug: msg="{{ item.stdout }}"
+    with_items: provision_docker_id.results
+
 
   # TODO: copy ALL host vars in the inventory
-  - name: "Associate ip address with hosts"
-    local_action:
-      module: add_host
-      name: "{{ item.1['name'] }}"
-      ansible_ssh_host: "{{ provision_docker_ip.results[item.0].stdout }}"
-      ansible_ssh_user: "{{ item.1['ansible_ssh_user']|default(provision_docker_ssh_user) }}"
-      ansible_ssh_pass: "{{ item.1['ansible_ssh_pass']|default(provision_docker_ssh_pass) }}"
-      groups: "{{ provision_docker_groups | union(item.1['groups']|default([])) | join(',') }}"
-    with_indexed_items: "{{ provision_docker_inventory }}"
-    changed_when: false
+  # - name: "Associate ip address with hosts"
+  #   local_action:
+  #     module: add_host
+  #     name: "{{ item.1['name'] }}"
+  #     container_id: "{{ provision_docker_id.results[item.0].stdout }}"
+  #     groups: "{{ provision_docker_groups | union(item.1['groups']|default([])) | join(',') }}"
+  #   with_indexed_items: "{{ provision_docker_inventory }}"
+  #   changed_when: false
 
-  - name: Wait for ssh
-    wait_for:
-      host: "{{ hostvars[item.name]['ansible_ssh_host'] }}"
-      port: 22
-      timeout: 30
-      connect_timeout: 30
-    with_items: "{{ provision_docker_inventory }}"
-  when: not provision_docker_use_docker_connection
+  # - name: Wait for ssh
+  #   wait_for:
+  #     host: "{{ hostvars[item.name]['ansible_ssh_host'] }}"
+  #     port: 22
+  #     timeout: 30
+  #     connect_timeout: 30
+  #   with_items: "{{ provision_docker_inventory }}"
+  # when: not provision_docker_use_docker_connection
 
 # TODO: copy ALL host vars in the inventory
-- name: "Add docker hosts with connection docker"
-  local_action:
-    module: add_host
-    name: "{{ item.1['name'] }}"
-    ansible_connection: docker
-    ansible_user: root
-    groups: "{{ provision_docker_groups | union(item.1['groups']|default([])) | join(',') }}"
-  with_indexed_items: "{{ provision_docker_inventory }}"
-  changed_when: false
-  when: provision_docker_use_docker_connection
-
-- name: Make sure able to connect to hosts
-  ping:
-  delegate_to: "{{ item['name'] }}"
-  with_items: "{{ provision_docker_inventory }}"
-
+# - name: "Add docker hosts with connection docker"
+#   local_action:
+#     module: add_host
+#     name: "{{ item.1['name'] }}"
+#     ansible_connection: docker
+#     ansible_user: root
+#     groups: "{{ provision_docker_groups | union(item.1['groups']|default([])) | join(',') }}"
+#   with_indexed_items: "{{ provision_docker_inventory }}"
+#   changed_when: false
+#   when: provision_docker_use_docker_connection
+#
+# - name: Make sure able to connect to hosts
+#   ping:
+#   delegate_to: "{{ item['name'] }}"
+#   with_items: "{{ provision_docker_inventory }}"
