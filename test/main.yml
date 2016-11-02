@@ -13,4 +13,4 @@
   hosts: localhost
   tasks:
     - shell: 'docker exec "{{ item.stdout }}" uname -r'
-      with_items: provision_docker_id.results
+      with_items: "{{provision_docker_id.results}}"
