@@ -3,8 +3,7 @@
   vars:
     inventory:
       - name: provision_docker_host_one
-        image: "ubuntu:14.04"
-
+        image: "hhercules/docker-ubuntu1404-ansible:latest"
   roles:
     - { role: docker_role, provision_docker_privileged: "{{ true }}", provision_docker_inventory: "{{ inventory }}" }
 
