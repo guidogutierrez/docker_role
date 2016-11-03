@@ -10,4 +10,4 @@
 - name: Run tests for cloud iface
   hosts: docker_containers
   tasks:
-    - shell: uname -r
+    - shell: ls -l /
