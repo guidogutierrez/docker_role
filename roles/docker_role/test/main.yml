@@ -22,7 +22,7 @@
       - name: provision_docker_host_one
         image: "hhercules/docker-ubuntu1404-ansible:latest"
   tasks:
-    - name: Bring up list of hosts
+    - name: shutdown containers
       local_action:
         module: docker
         name: "{{ item['name'] }}"
