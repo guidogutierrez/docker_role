@@ -1,5 +1,6 @@
 - name: Bring up docker cloud iface containers
   hosts: localhost
+  connection: local
   vars:
     inventory:
       - name: provision_docker_host_one
