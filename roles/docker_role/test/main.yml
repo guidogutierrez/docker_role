@@ -1,4 +1,4 @@
-- name: Bring up docker cloud iface containers
+- name: Bring up docker
   hosts: localhost
   connection: local
   vars:
@@ -8,7 +8,24 @@
   roles:
     - { role: docker_role, provision_docker_privileged: "{{ true }}", provision_docker_inventory: "{{ inventory }}" }
 
-- name: Run tests for cloud iface
+- name: Run tests
   hosts: docker_containers
   tasks:
     - shell: ls -l /
+
+
+- name: Kill container
+  hosts: localhost
+  connection: local
+  vars:
+    inventory:
+      - name: provision_docker_host_one
+        image: "hhercules/docker-ubuntu1404-ansible:latest"
+  tasks:
+    - name: Bring up list of hosts
+      local_action:
+        module: docker
+        name: "{{ item['name'] }}"
+        image: "{{ item.image }}"
+        state: killed
+      with_items: "{{ inventory }}"
