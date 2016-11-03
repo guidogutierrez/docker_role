@@ -19,13 +19,14 @@ install:
   - sudo pip install docker-py
     # software-properties-common for ubuntu 14.04
     # python-software-properties for ubuntu 12.04
-  # - sudo apt-get install -y sshpass software-properties-common python-software-properties
-  # - sudo apt-add-repository -y ppa:ansible/ansible
-  # - sudo apt-get update -qq
-  # - sudo apt-get install -y ansible
-  # - sudo rm /usr/bin/python && sudo ln -s /usr/bin/python2.7 /usr/bin/python
-  # - ansible --version
+  - sudo apt-get install -y sshpass software-properties-common python-software-properties
+  - sudo apt-add-repository -y ppa:ansible/ansible
+  - sudo apt-get update -qq
+  - sudo apt-get install -y ansible
+  - sudo rm /usr/bin/python && sudo ln -s /usr/bin/python2.7 /usr/bin/python
+  - ansible --version
 
 script:
-  - ansible-playbook roles/$TRAVIS_BRANCH/test/test.yml --syntax-check
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then for r in $(ls roles); do ansible-playbook roles/$r/test/test.yml; done; else; ansible-playbook roles/$TRAVIS_BRANCH/test/test.yml; fi
+  - echo "${TRAVIS_BRANCH}"
+  - ansible-playbook roles/${TRAVIS_BRANCH}/test/test.yml --syntax-check
+  - if [ "${TRAVIS_BRANCH}" == "master" ]; then for r in $(ls roles); do ansible-playbook roles/$r/test/test.yml; done; else; ansible-playbook roles/${TRAVIS_BRANCH}/test/test.yml; fi
