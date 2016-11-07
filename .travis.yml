@@ -9,9 +9,9 @@ env:
   global:
     - PATH="/usr/bin:$PATH"
 
-before_script:
-  # Pull container.
-  - 'docker pull hhercules/docker-${distro}-ansible:latest'
+# before_script:
+#   # Pull container.
+#   - 'docker pull hhercules/docker-${distro}-ansible:latest'
 
 before_install:
     # Ansible doesn't play well with virtualenv
