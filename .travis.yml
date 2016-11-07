@@ -9,12 +9,16 @@ env:
   global:
     - PATH="/usr/bin:$PATH"
 
+before_script:
+  # Pull container.
+  - 'docker pull hhercules/docker-${distro}-ansible:latest'
+
 before_install:
     # Ansible doesn't play well with virtualenv
   - deactivate
   - sudo apt-get update -qq
   - sudo apt-get install -y -o Dpkg::Options::="--force-confnew" docker-engine
-
+  - for role in $(ls roles/); do if [ -n  `git show --name-only --oneline ${TRAVIS_COMMIT} |egrep -v '^.{7} ' |tr '\n' ' ' 2>/dev/null` ]; then roles=$role; exit 0; fi; done
 install:
   - sudo pip install docker-py
     # software-properties-common for ubuntu 14.04
@@ -28,4 +32,4 @@ install:
 
 script:
   - echo "${TRAVIS_BRANCH}"
-  - if [ "${TRAVIS_BRANCH}" == "master" ]; then for r in $(ls roles); do ansible-playbook roles/$r/test/test.yml; done; else ansible-playbook roles/${TRAVIS_BRANCH}/test/test.yml --syntax-check; ansible-playbook roles/${TRAVIS_BRANCH}/test/test.yml; fi
+  - if [ "${TRAVIS_BRANCH}" == "master" ]; then for r in $(ls roles); do ansible-playbook roles/$r/test/test.yml; done; else ansible-playbook roles/${roles}/test/test.yml --syntax-check; ansible-playbook roles/${roles}/test/test.yml; fi
