@@ -14,6 +14,7 @@
   with_items: "{{ provision_docker_inventory }}"
 
 - block:
+  #
   # TODO: copy ALL host vars in the inventory
   - name: "Associate ip address with hosts"
     local_action:

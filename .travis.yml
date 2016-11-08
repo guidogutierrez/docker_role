@@ -9,6 +9,10 @@ env:
   global:
     - PATH="/usr/bin:$PATH"
 
+# before_script:
+#   # Pull container.
+#   - 'docker pull hhercules/docker-${distro}-ansible:latest'
+
 before_install:
     # Ansible doesn't play well with virtualenv
   - deactivate
@@ -27,6 +31,8 @@ install:
   - ansible --version
 
 script:
-  - echo "${TRAVIS_BRANCH}"
-  - ansible-playbook roles/${TRAVIS_BRANCH}/test/test.yml --syntax-check
-  - if [ "${TRAVIS_BRANCH}" == "master" ]; then for r in $(ls roles); do ansible-playbook roles/$r/test/test.yml; done; else; ansible-playbook roles/${TRAVIS_BRANCH}/test/test.yml; fi
+  - file=`git show --name-only --oneline "${TRAVIS_COMMIT}" | tail -n1 `
+  - role=`git show --name-only --oneline "${TRAVIS_COMMIT}" | tail -n1 | awk -F'/' '{print $2}'`
+  - echo "${role}"
+  - if [ $file == ".travis.yml" ] || [ -z $role ] ; then echo "no role changes"; exit 0; fi
+  - if [ "${TRAVIS_BRANCH}" == "master" ]; then for r in $(ls roles); do ansible-playbook roles/$r/test/test.yml; done; else ansible-playbook roles/${role}/test/test.yml --syntax-check; ansible-playbook roles/${role}/test/test.yml; fi
