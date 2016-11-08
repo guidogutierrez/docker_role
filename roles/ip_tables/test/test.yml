@@ -1,0 +1,36 @@
+---
+- name: Bring up docker containers
+  hosts: localhost
+  connection: local
+  vars:
+    inventory:
+      - name: iptables_host_1
+        image: "hhercules/docker-ubuntu1404-ansible:latest"
+  roles:
+    - { role: docker_role, provision_docker_inventory: "{{ inventory }}" }
+
+- name: Run iptables Tests
+  hosts: docker_containers
+  vars:
+    ports: [22, 1025, 1026]
+  roles:
+    - { role: ip_tables, iptables_allowed_tcp_ports: "{{ ports }}" }
+  tasks:
+    - name: Test ports
+      command: 'echo "hello world"'
+
+- name: Kill container
+  hosts: localhost
+  connection: local
+  vars:
+    inventory:
+      - name: iptables_host_1
+        image: "hhercules/docker-ubuntu1404-ansible:latest"
+  tasks:
+    - name: shutdown containers
+      local_action:
+        module: docker
+        name: "{{ item['name'] }}"
+        image: "{{ item.image }}"
+        state: killed
+      with_items: "{{ inventory }}"
