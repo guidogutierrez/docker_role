@@ -36,4 +36,3 @@ script:
   - echo "${role}"
   - if [ $file == ".travis.yml" ] || [ -z $role ] ; then echo "no role changes"; exit 0; else if [ "${TRAVIS_BRANCH}" == "master" ]; then for r in $(ls roles); do ansible-playbook roles/$r/test/test.yml; done; else ansible-playbook roles/${role}/test/test.yml --syntax-check; ansible-playbook roles/${role}/test/test.yml; fi
 ; fi
-  # - if [ "${TRAVIS_BRANCH}" == "master" ]; then for r in $(ls roles); do ansible-playbook roles/$r/test/test.yml; done; else ansible-playbook roles/${role}/test/test.yml --syntax-check; ansible-playbook roles/${role}/test/test.yml; fi
