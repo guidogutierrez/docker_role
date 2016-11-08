@@ -1,0 +1,16 @@
+
+- name: ensure iptables apt is installed
+  apt:
+    name: '{{ item }}'
+    state: present
+  with_items: iptables
+
+- name: create iptables configuration
+  template:
+    src: iptables.j2
+    dest: /etc/iptables.rules
+    owner: root
+    group: root
+    mode: 0600
+- name: restore iptables rules
+  shell: iptables-restore < /etc/iptables.rules
