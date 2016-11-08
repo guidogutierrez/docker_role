@@ -18,7 +18,7 @@ before_install:
   - deactivate
   - sudo apt-get update -qq
   - sudo apt-get install -y -o Dpkg::Options::="--force-confnew" docker-engine
-  - for role in $(ls roles/); do if [ -n  `git show --name-only --oneline "${TRAVIS_COMMIT}" |egrep -v '^.{7} ' |tr '\n' ' ' 2>/dev/null` ]; then roles=$role; echo "${roles}"; fi; done
+
 install:
   - sudo pip install docker-py
     # software-properties-common for ubuntu 14.04
@@ -31,5 +31,8 @@ install:
   - ansible --version
 
 script:
-  - echo "${TRAVIS_BRANCH}"
-  - if [ "${TRAVIS_BRANCH}" == "master" ]; then for r in $(ls roles); do ansible-playbook roles/$r/test/test.yml; done; else ansible-playbook roles/${roles}/test/test.yml --syntax-check; ansible-playbook roles/${roles}/test/test.yml; fi
+  - file=`git show --name-only --oneline "${TRAVIS_COMMIT}" | tail -n1 `
+  - role=`git show --name-only --oneline "${TRAVIS_COMMIT}" | tail -n1 | awk -F'/' '{print $2}'`
+  - echo "${role}"
+  - if [ $file == ".travis" ] && [ -z $role ] ; then echo "no role changes"; exit 0; fi
+  - if [ "${TRAVIS_BRANCH}" == "master" ]; then for r in $(ls roles); do ansible-playbook roles/$r/test/test.yml; done; else ansible-playbook roles/${role}/test/test.yml --syntax-check; ansible-playbook roles/${role}/test/test.yml; fi
