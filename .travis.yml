@@ -36,7 +36,7 @@ script:
   - changes=`git show --name-only --oneline "${TRAVIS_COMMIT}" | sed '1d'`
   - echo "${changes}"
   - >
-    for change in (echo "${changes}");
+    for change in $(echo "${changes}");
     do
     if [ $change == ".travis.yml" ];
     then
