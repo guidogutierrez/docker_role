@@ -12,7 +12,8 @@
   hosts: docker_containers
   tasks:
 
-    - shell: uname -r
+    - shell: uname -a
+
 
 
 - name: Kill container

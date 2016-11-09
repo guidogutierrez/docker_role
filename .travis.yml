@@ -36,27 +36,28 @@ script:
   - changes=`git show --name-only --oneline "${TRAVIS_COMMIT}" | sed '1d'`
   - echo "${changes}"
   - >
-    for change in $(echo "${changes}");
-    do
-    if [ $change == ".travis.yml" ];
-    then
-      echo "no role changes";
-    else
-       if [ "${TRAVIS_EVENT_TYPE}" == "pull_request" ];
+    if [ "${TRAVIS_EVENT_TYPE}" == "pull_request" ];
        then
           for r in $(ls roles);
           do
              ansible-playbook roles/$r/test/test.yml;
           done;
        else
-          directory=`echo $change | awk -F'/' '{print $1}'`;
-          if [ $directory == "roles" ];
-          then
-            role=`echo $change | awk -F'/' '{print $2}'`;
-            echo "running test for ${role}";
-            ansible-playbook roles/${role}/test/test.yml --syntax-check;
-            ansible-playbook roles/${role}/test/test.yml;
-          fi;
-       fi;
+          for change in $(echo "${changes}");
+          do
+            if [ $change == ".travis.yml" ];
+            then
+              echo "no role changes";
+            else
+
+               directory=`echo $change | awk -F'/' '{print $1}'`;
+               if [ $directory == "roles" ];
+               then
+                  role=`echo $change | awk -F'/' '{print $2}'`;
+                  echo "running test for ${role}";
+                  ansible-playbook roles/${role}/test/test.yml --syntax-check;
+                  ansible-playbook roles/${role}/test/test.yml;
+               fi;
+            fi;
+          done;
     fi;
-    done
