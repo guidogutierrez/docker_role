@@ -31,7 +31,28 @@ install:
   - ansible --version
 
 script:
-  - file=`git show --name-only --oneline "${TRAVIS_COMMIT}" | tail -n1 `
-  - role=`git show --name-only --oneline "${TRAVIS_COMMIT}" | tail -n1 | awk -F'/' '{print $2}'`
-  - echo "${role}"
-  - if [ $file == ".travis.yml" ] || [ -z $role ] ; then echo "no role changes"; exit 0; else if [ "${TRAVIS_EVENT_TYPE}" == "pull_request" ]; then for r in $(ls roles); do ansible-playbook roles/$r/test/test.yml; done; else ansible-playbook roles/${role}/test/test.yml --syntax-check; ansible-playbook roles/${role}/test/test.yml; fi; fi
+  # - file=`git show --name-only --oneline "${TRAVIS_COMMIT}" | tail -n1 `
+  # - role=`git show --name-only --oneline "${TRAVIS_COMMIT}" | tail -n1 | awk -F'/' '{print $2}'`
+  - changes=`git show --name-only --oneline "${TRAVIS_COMMIT}" | sed '1d'`
+  - echo "${changes}"
+  - for change in (echo "${changes}"); do if [ $change == ".travis.yml" ];
+  ->then
+      echo "no role changes"
+    else
+       if [ "${TRAVIS_EVENT_TYPE}" == "pull_request" ];
+       then
+          for r in $(ls roles);
+          do
+             ansible-playbook roles/$r/test/test.yml;
+          done
+       else
+          directory=`echo $change | awk -F'/' '{print $1}'`;
+          if [ $directory == "roles"];
+          then
+            role=`echo $change | awk -F'/' '{print $2}'`
+            ansible-playbook roles/${role}/test/test.yml --syntax-check
+            ansible-playbook roles/${role}/test/test.yml
+          fi
+       fi
+    fi
+    done
