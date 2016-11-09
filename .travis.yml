@@ -53,6 +53,7 @@ script:
           if [ $directory == "roles"];
           then
             role=`echo $change | awk -F'/' '{print $2}'`;
+            echo "running test for ${role}"
             ansible-playbook roles/${role}/test/test.yml --syntax-check;
             ansible-playbook roles/${role}/test/test.yml;
           fi;
