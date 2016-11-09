@@ -1,27 +1,30 @@
-- name: Bring up docker
+---
+- name: Bring up docker containers
   hosts: localhost
   connection: local
   vars:
     inventory:
-      - name: provision_docker_host_one
+      - name: iptables_host_1
         image: "hhercules/docker-ubuntu1404-ansible:latest"
   roles:
-    - { role: docker_role, provision_docker_privileged: "{{ true }}", provision_docker_inventory: "{{ inventory }}" }
+    - { role: docker_role, provision_docker_inventory: "{{ inventory }}" }
 
-- name: Run tests
+- name: Run iptables Tests
   hosts: docker_containers
+  vars:
+    ports: [22, 1025, 1026]
+  roles:
+    - { role: ip_tables, iptables_allowed_tcp_ports: "{{ ports }}" }
   tasks:
-
-    - shell: uname -a
-
-
+    - name: Test ports
+      command: 'ls -al'
 
 - name: Kill container
   hosts: localhost
   connection: local
   vars:
     inventory:
-      - name: provision_docker_host_one
+      - name: iptables_host_1
         image: "hhercules/docker-ubuntu1404-ansible:latest"
   tasks:
     - name: shutdown containers
