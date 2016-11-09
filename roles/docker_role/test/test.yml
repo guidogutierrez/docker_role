@@ -11,7 +11,7 @@
 - name: Run tests
   hosts: docker_containers
   tasks:
-  
+
     - shell: uname -r
 
 

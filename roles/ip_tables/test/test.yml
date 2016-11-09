@@ -17,7 +17,7 @@
     - { role: ip_tables, iptables_allowed_tcp_ports: "{{ ports }}" }
   tasks:
     - name: Test ports
-      command: 'uname -a'
+      command: 'uname -r'
 
 - name: Kill container
   hosts: localhost
