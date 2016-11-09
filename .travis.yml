@@ -35,8 +35,11 @@ script:
   # - role=`git show --name-only --oneline "${TRAVIS_COMMIT}" | tail -n1 | awk -F'/' '{print $2}'`
   - changes=`git show --name-only --oneline "${TRAVIS_COMMIT}" | sed '1d'`
   - echo "${changes}"
-  - for change in (echo "${changes}"); do if [ $change == ".travis.yml" ];
-  ->then
+  - >
+    for change in (echo "${changes}");
+    do
+    if [ $change == ".travis.yml" ];
+    then
       echo "no role changes"
     else
        if [ "${TRAVIS_EVENT_TYPE}" == "pull_request" ];
